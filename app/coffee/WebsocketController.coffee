@@ -35,6 +35,7 @@ module.exports = WebsocketController =
 			client.set("first_name", user?.first_name)
 			client.set("last_name", user?.last_name)
 			client.set("email", user?.email)
+			client.set("orcid", user?.orcid)
 			client.set("connected_time", new Date())
 			client.set("signup_date", user?.signUpDate)
 			client.set("login_count", user?.loginCount)
@@ -109,8 +110,8 @@ module.exports = WebsocketController =
 	updateClientPosition: (client, cursorData, callback = (error) ->) ->
 		metrics.inc "editor.update-client-position", 0.1
 		Utils.getClientAttributes client, [
-			"project_id", "first_name", "last_name", "email", "user_id"
-		], (error, {project_id, first_name, last_name, email, user_id}) ->
+			"project_id", "first_name", "last_name", "email", "user_id", "orcid"
+		], (error, {project_id, first_name, last_name, email, user_id, orcid}) ->
 			return callback(error) if error?
 			logger.log {user_id, project_id, client_id: client.id, cursorData: cursorData}, "updating client position"
 					
@@ -121,12 +122,14 @@ module.exports = WebsocketController =
 				cursorData.id      = client.id
 				cursorData.user_id = user_id if user_id?
 				cursorData.email   = email   if email?
+				cursorData.orcid   = orcid   if orcid?
 				if first_name? and last_name?
 					cursorData.name = first_name + " " + last_name
 					ConnectedUsersManager.updateUserPosition(project_id, client.id, {
 						first_name: first_name,
 						last_name:  last_name,
 						email:      email,
+						orcid:      orcid,
 						_id:        user_id
 					}, {
 						row:    cursorData.row,
