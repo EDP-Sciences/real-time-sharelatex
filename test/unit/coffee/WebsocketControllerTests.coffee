@@ -312,7 +312,8 @@ describe 'WebsocketController', ->
 					first_name: @first_name = "Douglas"
 					last_name: @last_name = "Adams"
 					email: @email = "joe@example.com"
-					user_id: @user_id = "user-id-123"
+					user_id: @user_id = "user-id-123",
+					orcid: @orcid = "orcid-123"
 				}
 				@client.get = (param, callback) => callback null, @clientParams[param]
 				@WebsocketController.updateClientPosition @client, @update
@@ -325,6 +326,7 @@ describe 'WebsocketController', ->
 					column: @column
 					email: @email
 					user_id: @user_id
+					orcid: @orcid
 
 			it "should send the update to the project room with the user's name", ->
 				@WebsocketLoadBalancer.emitToRoom.calledWith(@project_id, "clientTracking.clientUpdated", @populatedCursorData).should.equal true
@@ -334,7 +336,8 @@ describe 'WebsocketController', ->
 					_id: @user_id,
 					email: @email,
 					first_name: @first_name,
-					last_name: @last_name
+					last_name: @last_name,
+					orcid: @orcid
 				}, {
 					row: @row
 					column: @column
