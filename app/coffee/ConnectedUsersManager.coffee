@@ -33,7 +33,8 @@ module.exports =
 		multi.hset buildUserKey(project_id, client_id), "first_name", user.first_name or ""
 		multi.hset buildUserKey(project_id, client_id), "last_name", user.last_name or ""
 		multi.hset buildUserKey(project_id, client_id), "email", user.email or ""
-		
+		multi.hset buildUserKey(project_id, client_id), "orcid", user.orcid or ""
+
 		if cursorData?
 			multi.hset buildUserKey(project_id, client_id), "cursorData", JSON.stringify(cursorData)
 		multi.expire buildUserKey(project_id, client_id), USER_TIMEOUT_IN_S
