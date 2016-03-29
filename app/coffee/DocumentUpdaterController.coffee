@@ -2,6 +2,9 @@ logger = require "logger-sharelatex"
 settings = require 'settings-sharelatex'
 redis = require("redis-sharelatex")
 rclient = redis.createClient(settings.redis.web)
+SafeJsonParse = require "./SafeJsonParse"
+
+MESSAGE_SIZE_LOG_LIMIT = 1024 * 1024 # 1Mb
 
 module.exports = DocumentUpdaterController =
 	# DocumentUpdaterController is responsible for updates that come via Redis
@@ -13,11 +16,14 @@ module.exports = DocumentUpdaterController =
 			DocumentUpdaterController._processMessageFromDocumentUpdater(io, channel, message)
 		
 	_processMessageFromDocumentUpdater: (io, channel, message) ->
-		message = JSON.parse message
-		if message.op?
-			DocumentUpdaterController._applyUpdateFromDocumentUpdater(io, message.doc_id, message.op)
-		else if message.error?
-			DocumentUpdaterController._processErrorFromDocumentUpdater(io, message.doc_id, message.error, message)
+		SafeJsonParse.parse message, (error, message) ->
+			if error?
+				logger.error {err: error, channel}, "error parsing JSON"
+				return
+			if message.op?
+				DocumentUpdaterController._applyUpdateFromDocumentUpdater(io, message.doc_id, message.op)
+			else if message.error?
+				DocumentUpdaterController._processErrorFromDocumentUpdater(io, message.doc_id, message.error, message)
 
 	_applyUpdateFromDocumentUpdater: (io, doc_id, update) ->
 		for client in io.sockets.clients(doc_id)

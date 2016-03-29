@@ -19,10 +19,10 @@ module.exports =
 			pass: "password"
 		documentupdater:
 			url: "http://localhost:3003"
-		trackchanges:
-			url: "http://localhost:3015"
 			
 	security:
 		sessionSecret: "secret-please-change"
 		
 	cookieName:"sharelatex.sid"
+	
+	max_doc_length: 2 * 1024 * 1024 # 2mb
